@@ -24,7 +24,6 @@ var server = http.createServer(app);
 /* socket.io code for making sockets*/
 
 var io = require('socket.io').listen(server);
-console.log('www js');
 require('../sockets/base')(io);
 
 
