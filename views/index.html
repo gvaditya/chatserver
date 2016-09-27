@@ -16,19 +16,28 @@
   </style>
 </head>
 <body>
+  <label>Online Users:</label>
+  <ul id="list"></ul>
   <ul id="messages"></ul>
   <form action="">
     <input id="m" autocomplete="off" /><button id="b">Send</button>
   </form>
   <script>
+  var presentUser = <%- JSON.stringify(myObject) %>;
   var socket = io();
+  socket.emit('add',presentUser.name);
   $('#b').click(function(){
-   socket.emit('message', $('#m').val());
-   $('#m').val('');
-   return false;
- });
- socket.on('message', function(msg){
+    socket.emit('messageUser', {message:$('#m').val(),user:presentUser.name});
+    $('#m').val('');
+    return false;
+  });
+  socket.on('message', function(msg){
     $('#messages').append($('<li>').text(msg));
+  });
+  socket.on('addUser',function(list){
+    var newList = list.map(function(a) {return a.user;});
+    console.log(newList);
+    $('#list').html($('<li>').text(newList));
   });
   </script>
 </body>

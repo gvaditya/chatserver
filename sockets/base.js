@@ -1,11 +1,26 @@
-module.exports = function (io) {io.on('connection', function(socket){
-  io.emit('message','a user connected');
-  // console.log('a user connected');
+module.exports = function (io,list) {io.on('connection', function(socket){
   socket.on('disconnect', function(){
-    io.emit('message','user disconnected');
+    var user;
+    var result = list.filter(function( obj ) {
+      if(obj.socket == socket.id)
+      {
+        user = obj;
+      }
+      return obj.socket != socket.id;
+    });
+    list=result;
+    io.emit('addUser',list);
+    io.emit('message',user.user+' left');
   });
   socket.on('message', function(msg){
-    // console.log('message: ' + msg);
-    io.emit('message','message: '+msg);
+    io.emit('message',msg);
   });
+  socket.on('messageUser', function(msg){
+    io.emit('message',msg.user+":"+msg.message);
+  });
+  socket.on('add',function(user){
+    list[list.length] = {'user':user,'socket':socket.id};
+    io.emit('message',user+" connected");
+    io.emit('addUser',list);
+  })
 });};

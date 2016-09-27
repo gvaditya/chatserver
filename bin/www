@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('chatserver:server');
 var http = require('http');
+var list =[];
 
 /**
  * Get port from environment and store in Express.
@@ -24,7 +25,7 @@ var server = http.createServer(app);
 /* socket.io code for making sockets*/
 
 var io = require('socket.io').listen(server);
-require('../sockets/base')(io);
+require('../sockets/base')(io,list);
 
 
 /**
