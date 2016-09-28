@@ -17,9 +17,9 @@ module.exports = function (io,list) {io.on('connection', function(socket){
   socket.on('message', function(msg){
     io.emit('message',msg);
   });
-  //Message sent by a user
+  //Message sent by a user to group
   socket.on('messageUser', function(msg){
-    io.emit('message',msg.user+":"+msg.message);
+    io.emit('groupMessage',{'sender':msg.user,'message':msg.message});
   });
   //Add a user to online users list
   socket.on('add',function(user){
@@ -39,9 +39,18 @@ module.exports = function (io,list) {io.on('connection', function(socket){
       if(obj.userName == data.sender)
       sender= obj;
     });
-    //console.log(data.reciever);
-    //console.log(sender.socket);
-    //console.log(io.sockets.connected);
     io.sockets.connected[sender.socket].emit('requestAccepted', data.reciever);
+  });
+  //Recieve personal message and send it corresponding members
+  socket.on('messagePersonal', function(msg){
+    var messageReciever,messageSender;
+    list.forEach(function(obj){
+      if(obj.userName == msg.reciever)
+      messageReciever = obj;
+      else if(obj.userName == msg.sender)
+      messageSender = obj;
+    });
+    //io.sockets.connected[messageSender.socket].emit('sendPersonalMessage',{'message':"You:"+msg.message,'sender':msg.sender,'reciever':msg.reciever});
+    io.sockets.connected[messageReciever.socket].emit('sendPersonalMessage',{'message':msg.sender+":"+msg.message,'sender':msg.sender,'reciever':msg.reciever});
   });
 });};
